@@ -47,8 +47,7 @@ class Template(object):
                         for match in self.query_file(filepath):
                             yield filepath, match
                     except SyntaxError as e:
-                        warnings.warn(
-                            "Failed to parse {}:\n{}".format(filepath, e))
+                        warnings.warn(f"Failed to parse {filepath}:\n{e}")
 
 
 class TemplateTransformer(ast.NodeTransformer):
@@ -79,11 +78,8 @@ class TemplateTransformer(ast.NodeTransformer):
             raise TemplateMismatch(path, node, "empty")
 
     def visit_Name(self, node):
-        if node.id == self.__WILDCARD_NAME:
+        if node.id in [self.__WILDCARD_NAME, self.__MULTIWILDCARD_NAME]:
             return self.must_exist
-        elif node.id == self.__MULTIWILDCARD_NAME:
-            return self.must_exist
-
         return NameOrAttr(node.id)
 
     def transform_wildcard(self, node, attrname):
@@ -136,11 +132,7 @@ class TemplateTransformer(ast.NodeTransformer):
                 )
                 break
         else:
-            if node.args:
-                args = self.visit_list(node.args)
-            else:
-                args = self.must_not_exist
-
+            args = self.visit_list(node.args) if node.args else self.must_not_exist
         defaults = [
             (a.arg, self.visit(d))
             for a, d in zip(node.args[-len(node.defaults):], node.defaults)
@@ -148,10 +140,7 @@ class TemplateTransformer(ast.NodeTransformer):
         ]
 
         if node.vararg is None:
-            if positional_final_wildcard:
-                vararg = None
-            else:
-                vararg = self.must_not_exist
+            vararg = None if positional_final_wildcard else self.must_not_exist
         else:
             vararg = self.visit(node.vararg)
 
@@ -167,10 +156,7 @@ class TemplateTransformer(ast.NodeTransformer):
         ) or any(a.arg == self.__MULTIWILDCARD_NAME for a in node.kwonlyargs)
 
         if node.kwarg is None:
-            if koa_subset:
-                kwarg = None
-            else:
-                kwarg = self.must_not_exist
+            kwarg = None if koa_subset else self.must_not_exist
         else:
             kwarg = self.visit(node.kwarg)
 
@@ -243,9 +229,7 @@ class TemplateTransformer(ast.NodeTransformer):
                         assert_ast_equal(
                             sample_kwargs[k.arg], k.value, path + [k.arg])
                     else:
-                        raise TemplateMismatch(
-                            path, "(missing)", "keyword arg %s" % k.arg
-                        )
+                        raise TemplateMismatch(path, "(missing)", f"keyword arg {k.arg}")
 
             if template_keywords:
                 node.keywords = kwargs_checker
@@ -342,14 +326,12 @@ class Middle(object):
 
     def __radd__(self, other):
         if not isinstance(other, list):
-            raise TypeError(
-                "Cannot add {} and Middle objects".format(type(other)))
+            raise TypeError(f"Cannot add {type(other)} and Middle objects")
         return Middle(other + self.front, self.back)
 
     def __add__(self, other):
         if not isinstance(other, list):
-            raise TypeError(
-                "Cannot add Middle and {} objects".format(type(other)))
+            raise TypeError(f"Cannot add Middle and {type(other)} objects")
         return Middle(self.front, self.back + other)
 
     def __call__(self, sample_list, path):
@@ -379,9 +361,7 @@ class TemplateMismatch(AssertionError):
         self.got = got
 
     def __str__(self):
-        return ("Mismatch at {}.\n" "Found   : {}\n" "Expected: {}").format(
-            format_path(self.path), self.got, self.expected
-        )
+        return f"Mismatch at {format_path(self.path)}.\nFound   : {self.got}\nExpected: {self.expected}"
 
 
 class TemplateNodeTypeMismatch(TemplateMismatch):
@@ -391,23 +371,17 @@ class TemplateNodeTypeMismatch(TemplateMismatch):
             if isinstance(self.expected, ast.AST)
             else self.expected
         )
-        return "At {}, found {} node instead of {}".format(
-            format_path(self.path), type(self.got).__name__, expected
-        )
+        return f"At {format_path(self.path)}, found {type(self.got).__name__} node instead of {expected}"
 
 
 class TemplateNodeListMismatch(TemplateMismatch):
     def __str__(self):
-        return "At {}, found {} node(s) instead of {}".format(
-            format_path(self.path), len(self.got), len(self.expected)
-        )
+        return f"At {format_path(self.path)}, found {len(self.got)} node(s) instead of {len(self.expected)}"
 
 
 class TemplatePlainListMismatch(TemplateMismatch):
     def __str__(self):
-        return ("At {}, lists differ.\nFound   : {}\nExpected: {}").format(
-            format_path(self.path), self.got, self.expected
-        )
+        return f"At {format_path(self.path)}, lists differ.\nFound   : {self.got}\nExpected: {self.expected}"
 
 
 class TemplatePlainObjMismatch(TemplateMismatch):
@@ -471,8 +445,7 @@ class DefArgsCheck:
                 sample_arg, sample_dflt = sample_kwonlyargs[argname]
             except KeyError:
                 raise TemplateMismatch(
-                    path +
-                    ["kwonlyargs"], "(missing)", "keyword arg %s" % argname
+                    path + ["kwonlyargs"], "(missing)", f"keyword arg {argname}"
                 )
             else:
                 assert_ast_equal(
@@ -486,8 +459,7 @@ class DefArgsCheck:
 
         if not self.koa_subset:
             template_kwarg_names = {k.arg for k, d in self.kwonly_args_dflts}
-            excess_names = set(sample_kwonlyargs) - template_kwarg_names
-            if excess_names:
+            if excess_names := set(sample_kwonlyargs) - template_kwarg_names:
                 raise TemplateMismatch(
                     path +
                     ["kwonlyargs"], excess_names, "(not present in template)"
@@ -503,7 +475,7 @@ def format_path(path):
         if isinstance(part, int):
             formed.append("[%d]" % part)
         else:
-            formed.append("." + part)
+            formed.append(f".{part}")
     return "".join(formed)
 
 
@@ -540,11 +512,10 @@ def assert_ast_equal(sample, template, path=None):
                     template_field[0])
             ):
                 check_node_list(field_path, sample_field, template_field)
-            else:
-                if sample_field != template_field:
-                    raise TemplatePlainListMismatch(
-                        field_path, sample_field, template_field
-                    )
+            elif sample_field != template_field:
+                raise TemplatePlainListMismatch(
+                    field_path, sample_field, template_field
+                )
 
         elif isinstance(template_field, ast.AST):
             assert_ast_equal(sample_field, template_field, field_path)
@@ -552,10 +523,9 @@ def assert_ast_equal(sample, template, path=None):
         elif callable(template_field):
             template_field(sample_field, field_path)
 
-        else:
-            if sample_field != template_field:
-                raise TemplatePlainObjMismatch(
-                    field_path, sample_field, template_field)
+        elif sample_field != template_field:
+            raise TemplatePlainObjMismatch(
+                field_path, sample_field, template_field)
 
 
 def is_ast_equal(sample, template):
