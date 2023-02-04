@@ -31,9 +31,7 @@ class Parser:
         }
 
         if file_name is not None:
-            path = lambda root, fn: root / "{}.py".format(fn)
-            # if file_name == "menu" or file_name == "stats":
-                # full_path = path(ext, file_name)
+            path = lambda root, fn: root / f"{fn}.py"
             if file_name == "sensor":
                 full_path = path(Path.cwd(), file_name)
             else:
@@ -85,22 +83,19 @@ class Parser:
 
     @property
     def message(self):
-        return "{} on or around line {} in `{}`.".format(
-            self.data["message"], self.data["start_pos"], self.data["full_path"]
-        )
+        return f'{self.data["message"]} on or around line {self.data["start_pos"]} in `{self.data["full_path"]}`.'
 
     def match(self, template):
         return Parser(None, list(filter(Query(template).match, self.nodes)))
 
     def execute(self, expr):
         result = Tree(self.nodes).execute(expr)
-        if isinstance(result, (generator, chain, map)):
-            process = list(result)
-            return (
-                Parser(None, process[0]) if len(process) == 1 else Parser(None, process)
-            )
-        else:
+        if not isinstance(result, (generator, chain, map)):
             return Parser(None, result)
+        process = list(result)
+        return (
+            Parser(None, process[0]) if len(process) == 1 else Parser(None, process)
+        )
 
     ex = execute
 
@@ -117,10 +112,16 @@ class Parser:
         return Parser(None, [flatten(self.execute("$.body[@.type is 'Assign']").n)])
     
     def def_args_(self, name):
-        return Parser(None, [flatten(self.execute("$.body[@.type is 'FunctionDef' and @.name is '{}']".format(
-            name
+        return Parser(
+            None,
+            [
+                flatten(
+                    self.execute(
+                        f"$.body[@.type is 'FunctionDef' and @.name is '{name}']"
+                    ).n
+                )
+            ],
         )
-        ).n)])
 
     def assigns(self):
         return Parser(
@@ -133,16 +134,12 @@ class Parser:
 
     def defines(self, name):
         return self.execute(
-            "$.body[@.type is 'FunctionDef' and @.name is '{}'].(name, args, body, decorator_list)".format(
-                name
-            )
+            f"$.body[@.type is 'FunctionDef' and @.name is '{name}'].(name, args, body, decorator_list)"
         )
 
     def class_(self, name):
         return self.execute(
-            "$.body[@.type is 'ClassDef' and @.name is '{}'].(name, args, body)".format(
-                name
-            )
+            f"$.body[@.type is 'ClassDef' and @.name is '{name}'].(name, args, body)"
         )
 
     def decorators(self):
@@ -155,9 +152,7 @@ class Parser:
         return Parser(None, [flatten(self.execute("$.body[@.type is 'Return']").n)])
 
     def method(self, name):
-        return self.execute(
-            "$..body[@.type is 'FunctionDef' and @.name is '{}']".format(name)
-        )
+        return self.execute(f"$..body[@.type is 'FunctionDef' and @.name is '{name}']")
 
     def has_arg(self, name, pos=0):
         nodes = self.execute("$.args.args.arg").n
@@ -173,9 +168,7 @@ class Parser:
 
     def from_imports(self, mod, alias):
         nodes = self.execute(
-            "$.body[@.type is 'ImportFrom' and @.module is '{}'].names..name".format(
-                mod
-            )
+            f"$.body[@.type is 'ImportFrom' and @.module is '{mod}'].names..name"
         ).n
         return alias in (nodes if isinstance(nodes, list) else [nodes])
 

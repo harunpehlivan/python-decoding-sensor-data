@@ -27,9 +27,9 @@ def test_house_info_create_class_module2(parse):
 
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     # my_class = house_info.class_(test_class)
-    my_class = my_file.query("class {}(): ??".format(test_class))
+    my_class = my_file.query(f"class {test_class}(): ??")
     assert (
         my_class.exists()
     ), "Have you created a class called `{0}` in the `{1}` file?".format(test_class, test_file)
@@ -37,9 +37,9 @@ def test_house_info_create_class_module2(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a constructor called `{}`?".format(test_method)
-    
-    
+    ), f"Are you defining a constructor called `{test_method}`?"
+        
+
     my_class_arguments = (
         my_class.def_args_(test_method).match(
             {
@@ -60,9 +60,9 @@ def test_house_info_create_class_module2(parse):
         my_class_arguments
     ), """Are you defining a constructor `{0}` for the `{1}` class?
         Are you declaring the correct name and number of parameters?""".format(test_method, test_class)
-    
+
     # debug_test_case(my_method) 
-    
+
     # Check for assignment 
     test_code = (
         my_method.assign_().match(
@@ -95,9 +95,9 @@ def test_house_info_get_data_by_area_module2(parse):
 
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     # my_class = house_info.class_(test_class)
-    my_class = my_file.query("class {}(): ??".format(test_class))
+    my_class = my_file.query(f"class {test_class}(): ??")
     assert (
         my_class.exists()
     ), "Have you created a class called `{0}` in the `{1}` file?".format(test_class, test_file)
@@ -105,8 +105,8 @@ def test_house_info_get_data_by_area_module2(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     my_class_arguments = (
@@ -137,7 +137,7 @@ def test_house_info_get_data_by_area_module2(parse):
     ), """Are you defining a method `{0}` for the `{1}` class?
         Are you declaring the correct name and number of parameters?""".format(test_method, test_class)
 
-    
+
     test_code = (
         my_method.assign_().match(
             {
@@ -170,9 +170,9 @@ def test_house_info_get_data_by_area_loop_module2(parse):
 
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     # my_class = house_info.class_(test_class)
-    my_class = my_file.query("class {}(): ??".format(test_class))
+    my_class = my_file.query(f"class {test_class}(): ??")
     assert (
         my_class.exists()
     ), "Have you created a class called `{0}` in the `{1}` file?".format(test_class, test_file)
@@ -180,8 +180,8 @@ def test_house_info_get_data_by_area_loop_module2(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     test_code = (
@@ -227,7 +227,7 @@ def test_house_info_get_data_by_area_loop_module2(parse):
     ), """The length of your filter data when calling `get_data_by_area` is incorrect.
         Your call should have the first argument as `id`, and the second argument as `rec_area=2
         Check the logic inside your loop"""
-    
+
     home_temp = home_info.get_data_by_area("id", rec_area=-999)
     assert (
         len(home_temp) == 0
@@ -249,9 +249,9 @@ def test_house_info_get_data_by_date_module2(parse):
 
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     # my_class = house_info.class_(test_class)
-    my_class = my_file.query("class {}(): ??".format(test_class))
+    my_class = my_file.query(f"class {test_class}(): ??")
     assert (
         my_class.exists()
     ), "Have you created a class called `{0}` in the `{1}` file?".format(test_class, test_file)
@@ -259,8 +259,8 @@ def test_house_info_get_data_by_date_module2(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     house_info_import = my_file.from_imports(
@@ -299,7 +299,7 @@ def test_house_info_get_data_by_date_module2(parse):
     ), """Are you defining a method `get_data_by_date` 
         with the correct name and number of parameters?
         Are you setting the third parameter's default value to `date.today()`?"""
-    
+
     # debug_test_case(my_method) 
 
     test_code = (
@@ -331,9 +331,9 @@ def test_house_info_get_data_by_date_loop_module2(parse):
 
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     # my_class = house_info.class_(test_class)
-    my_class = my_file.query("class {}(): ??".format(test_class))
+    my_class = my_file.query(f"class {test_class}(): ??")
     assert (
         my_class.exists()
     ), "Have you created a class called `{0}` in the `{1}` file?".format(test_class, test_file)
@@ -341,10 +341,10 @@ def test_house_info_get_data_by_date_loop_module2(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
-    
+
     # assert False
     first_for = (
         my_method.for_().match(
@@ -427,7 +427,7 @@ def test_house_info_get_data_by_date_loop_module2(parse):
         Your call should have the first argument as `id`, 
             and the second argument as `datetime` object with the format: "%m/%d/%Y"
         Check the logic inside your loop"""
-    
+
     rec_date = datetime.strptime("5/9/2020", "%m/%d/%Y")
     home_temp = home_info.get_data_by_date("id", rec_date)
     assert (
@@ -448,16 +448,18 @@ def test_sensor_app_house_info_by_area_module2(parse):
     # print("\nHouse sensor records for area {} = {}".format(test_area, len(recs)))
 
     test_file = "sensor_app"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
-    
+
     my_file_import = my_file.from_imports(
         "house_info", "HouseInfo")
-    assert my_file_import, "Are you importing `HouseInfo` from `house_info` in `{}` file".format(test_file)
+    assert (
+        my_file_import
+    ), f"Are you importing `HouseInfo` from `house_info` in `{test_file}` file"
 
     # debug_test_case(my_file)    
-    
+
     test_code = (
         my_file.assign_().match(
             {
@@ -478,7 +480,7 @@ def test_sensor_app_house_info_by_area_module2(parse):
     ), """Are you creating an instance of the class `HouseInfo` with 
         `data` list as the initialization argument for the constructor?
         """
-    
+
     test_code = (
         my_file.assign_().match(
             {

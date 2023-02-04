@@ -7,13 +7,15 @@ def test_temperature_import_module3(parse):
     # from house_info import HouseInfo
 
     test_file = "temperature_info"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
     my_file_import = my_file.from_imports(
         "house_info", "HouseInfo")
-    assert my_file_import, "Are you importing `HouseInfo` from `house_info` in `{}` file".format(test_file)
+    assert (
+        my_file_import
+    ), f"Are you importing `HouseInfo` from `house_info` in `{test_file}` file"
 
 
 @pytest.mark.test_temperature_create_class_module3
@@ -39,10 +41,10 @@ def test_temperature_create_class_module3(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
-    
+
     my_class_arguments = (
         my_class.def_args_(test_method).match(
             {
@@ -65,7 +67,7 @@ def test_temperature_create_class_module3(parse):
         my_class_arguments
     ), """Are you defining a method `{0}` for the `{1}` class?
         Are you declaring the correct name and number of parameters?""".format(test_method, test_class)
-    
+
     # Check for assignment 
     test_code = (
         my_method.assign_().match(
@@ -93,7 +95,7 @@ def test_temperature_convert_loop_module3(parse):
     parent_class = "HouseInfo"
     test_class = "TemperatureData"
     test_method = "_convert_data"
-   
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
@@ -106,8 +108,8 @@ def test_temperature_convert_loop_module3(parse):
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     test_code = (
@@ -152,7 +154,7 @@ def test_temperature_convert_loop_module3(parse):
         test_code
     ), """Inside your loop, are you converting `rec` value to integer `base=10`
         Are you appending it to `recs` list?"""
-    
+
     test_code= (
         my_method.returns_call().match(
             {
@@ -165,19 +167,19 @@ def test_temperature_convert_loop_module3(parse):
     )
     assert (
         test_code
-    ), """Are you returning `recs` list from the `{}` method?""".format(test_method)
+    ), f"""Are you returning `recs` list from the `{test_method}` method?"""
 
 
 @pytest.mark.test_temperature_by_area_method_module3
 def test_temperature_by_area_method_module3(parse):
     # def get_data_by_area(self, rec_area=0):
     #     data = super().get_data_by_area("temperature", rec_area)
-    
+
     test_file = "temperature_info"
     parent_class = "HouseInfo"
     test_class = "TemperatureData"
     test_method = "get_data_by_area"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
@@ -188,12 +190,12 @@ def test_temperature_by_area_method_module3(parse):
         Is your class inheritings the properties of the `{1}` class?""".format(test_class, parent_class)
 
     # debug_test_case_class(my_class, test_method) 
-    
+
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     my_class_arguments = (
@@ -252,12 +254,12 @@ def test_temperature_by_area_method_module3(parse):
 def test_temperature_by_area_method_return_module3(parse):
     # ...
     #     return self._convert_data(recs)
-    
+
     test_file = "temperature_info"
     parent_class = "HouseInfo"
     test_class = "TemperatureData"
     test_method = "get_data_by_area"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
@@ -268,12 +270,12 @@ def test_temperature_by_area_method_return_module3(parse):
         Is your class inheritings the properties of the `{1}` class?""".format(test_class, parent_class)
 
     # debug_test_case_class(my_class, test_method) 
-    
+
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     test_code = (
@@ -302,19 +304,21 @@ def test_temperature_by_date_method_module3(parse):
     # from datetime import date
     # def get_data_by_date(self, rec_date=date.today()):
     #     recs = super().get_data_by_date("temperature", rec_date)
-    
+
     test_file = "temperature_info"
     parent_class = "HouseInfo"
     test_class = "TemperatureData"
     test_method = "get_data_by_date"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
     my_file_import = my_file.from_imports(
         "datetime", "date")
-    assert my_file_import, "Are you importing `date` from `datetime` in `{}`".format(test_file)
-    
+    assert (
+        my_file_import
+    ), f"Are you importing `date` from `datetime` in `{test_file}`"
+
     my_class = my_file.query("class {0}({1}): ??".format(test_class, parent_class))
     assert (
         my_class.exists()
@@ -322,12 +326,12 @@ def test_temperature_by_date_method_module3(parse):
         Is your class inheritings the properties of the `{1}` class?""".format(test_class, parent_class)
 
     # debug_test_case_class(my_class, test_method) 
-    
+
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     my_class_arguments = (
@@ -390,12 +394,12 @@ def test_temperature_by_date_method_module3(parse):
 def test_temperature_by_date_method_return_module3(parse):
     # ...
     #     return self._convert_data(recs)
-    
+
     test_file = "temperature_info"
     parent_class = "HouseInfo"
     test_class = "TemperatureData"
     test_method = "get_data_by_date"
-    
+
     my_file = parse(test_file)
     assert my_file.success, my_file.message
 
@@ -406,12 +410,12 @@ def test_temperature_by_date_method_return_module3(parse):
         Is your class inheritings the properties of the `{1}` class?""".format(test_class, parent_class)
 
     # debug_test_case_class(my_class, test_method) 
-    
+
     my_method = my_file.class_(test_class).method(test_method)
     assert (
         my_method.exists()
-    ), "Are you defining a method called `{}`?".format(test_method)
-    
+    ), f"Are you defining a method called `{test_method}`?"
+
     # debug_test_case(my_method) 
 
     test_code = (
